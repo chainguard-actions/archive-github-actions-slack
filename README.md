@@ -11,6 +11,7 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 | v2.10.1 | [`v2.10.1`](https://github.com/chainguard-actions/archive-github-actions-slack/tree/v2.10.1) | [`c643e50`](https://github.com/archive/github-actions-slack/commit/c643e5093620d65506466f2c9b317d5d29a5e517) |
 | v2.11.0 | [`v2.11.0`](https://github.com/chainguard-actions/archive-github-actions-slack/tree/v2.11.0) | [`b1d2792`](https://github.com/archive/github-actions-slack/commit/b1d27920d1b9cbacbfe6732572d325baf93ae402) |
 | v3.0.0 | [`v3.0.0`](https://github.com/chainguard-actions/archive-github-actions-slack/tree/v3.0.0) | [`fdb954e`](https://github.com/archive/github-actions-slack/commit/fdb954e05498dae1efad32a84ecbd15ef65b3a19) |
+| v3.0.1 | [`v3.0.1`](https://github.com/chainguard-actions/archive-github-actions-slack/tree/v3.0.1) | [`9caed1e`](https://github.com/archive/github-actions-slack/commit/9caed1e6eb85ab64a374ada06de8deb3d3e4964b) |
 | v3.1.0 | [`v3.1.0`](https://github.com/chainguard-actions/archive-github-actions-slack/tree/v3.1.0) | [`433fef9`](https://github.com/archive/github-actions-slack/commit/433fef9978d3adae73168bfc9c5a7ce722780231) |
 
 ## Privacy
