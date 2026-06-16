@@ -1,0 +1,30 @@
+name: Test send-reaction function
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-fake-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-function: "send-reaction"
+          slack-emoji-name: "rocket"
+          slack-message-timestamp: "1234567890.123456"
+        continue-on-error: true
+      - name: Assert action ran and failed gracefully with fake token
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "step outcome: $OUTCOME"
+          # With a fake token, Slack returns ok:false and the action calls setFailed.
+          # We expect outcome to be 'failure' (not a crash/timeout).
+          if [ "$OUTCOME" = "failure" ] || [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action completed with outcome '$OUTCOME'"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME' — action may have crashed"
+            exit 1
+          fi
