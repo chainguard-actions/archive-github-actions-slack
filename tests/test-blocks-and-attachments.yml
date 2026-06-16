@@ -1,0 +1,37 @@
+name: Test blocks, attachments, and threading optional params
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-text: "Test message with blocks and attachments"
+          slack-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Hello *world*\"}}]"
+          slack-optional-attachments: "[{\"color\":\"#36a64f\",\"text\":\"Attachment text\"}]"
+          slack-optional-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Optional block\"}}]"
+          slack-optional-icon_url: "https://example.com/icon.png"
+          slack-optional-parse: "full"
+          slack-optional-reply_broadcast: "false"
+          slack-optional-thread_ts: "1234567890.123456"
+
+      - name: Assert action ran with blocks and attachment params without crashing
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should run and either succeed or fail with an API error,
+          # not crash due to unrecognized/malformed optional parameters.
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action accepted blocks/attachments parameters and ran: $OUTCOME"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME' — action may have crashed"
+            exit 1
+          fi

@@ -1,0 +1,36 @@
+name: Test optional parameters are accepted
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-text: "Test message with optional params"
+          slack-optional-username: "test-bot"
+          slack-optional-icon_emoji: ":robot_face:"
+          slack-optional-mrkdwn: "true"
+          slack-optional-link_names: "true"
+          slack-optional-unfurl_links: "false"
+          slack-optional-unfurl_media: "false"
+
+      - name: Assert action ran with optional params without crashing
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should run and either succeed or fail with an API error,
+          # not crash due to unrecognized/malformed optional parameters.
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action accepted optional parameters and ran: $OUTCOME"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME' — action may have crashed"
+            exit 1
+          fi

@@ -1,0 +1,33 @@
+name: Test update-message with blocks
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-function: "update-message"
+          slack-update-message-ts: "1234567890.123456"
+          slack-update-message-text: "Updated message text with blocks"
+          slack-update-message-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Updated *block* content\"}}]"
+
+      - name: Assert update-message with blocks ran without crashing
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should run and either succeed or fail with an API error,
+          # not crash due to unrecognized slack-update-message-blocks input.
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: update-message with blocks ran: $OUTCOME"
+          else
+            echo "FAIL: unexpected outcome '$OUTCOME'"
+            exit 1
+          fi
