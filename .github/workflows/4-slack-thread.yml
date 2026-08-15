@@ -1,0 +1,45 @@
+name: test-4-slack-thread
+
+on: [push]
+
+permissions: {}
+
+jobs:
+  slack-action:
+    #if: ${{ false }}
+    runs-on: macos-latest
+    name: Test 4 [macos-latest]
+
+    steps:
+      - name: Send Slack Message
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        id: send-message
+
+        with:
+          slack-function: send-message
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: C036E7G0RPH
+          slack-text: Test 4 - Message to send thread to
+
+      - name: Send "Slack Message" Result
+        env:
+          SLACK_RESULT: ${{ steps.send-message.outputs.slack-result }}
+        run: echo "Data - $SLACK_RESULT"
+
+      - name: Some step in between
+        run: echo '...'
+
+      - name: Send Thread Message
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        with:
+          slack-function: send-message
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: ${{ fromJson(steps.send-message.outputs.slack-result).response.channel }}
+          slack-text: Test 4.1 - Reply in thread
+          slack-optional-thread_ts: ${{ fromJson(steps.send-message.outputs.slack-result).response.message.ts }}
+          #slack-optional-reply_broadcast: true # To broadcast thread reply in channel
+
+      - name: Send "Send Thread Message" Result
+        env:
+          SLACK_RESULT: ${{ steps.send-message.outputs.slack-result }}
+        run: echo "Data - $SLACK_RESULT"

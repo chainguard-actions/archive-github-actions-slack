@@ -1,4 +1,4 @@
-name: Test send-message with blocks and attachments
+name: Test send-message with formatting optional parameters
 on:
   workflow_dispatch:
 jobs:
@@ -13,12 +13,12 @@ jobs:
         with:
           slack-bot-user-oauth-access-token: "xoxb-fake-token-for-testing"
           slack-channel: "C0000000000"
-          slack-text: "Test message with blocks"
-          slack-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Hello *world*\"}}]"
-          slack-optional-attachments: "[{\"color\":\"#36a64f\",\"text\":\"Attachment text\"}]"
-          slack-optional-blocks: "[{\"type\":\"divider\"}]"
+          slack-text: "Test message with formatting options"
+          slack-optional-icon_url: "https://example.com/icon.png"
+          slack-optional-link_names: "true"
+          slack-optional-parse: "full"
 
-      - name: Assert action failed with invalid token (expected, not due to blocks/attachments params)
+      - name: Assert action failed with invalid token (expected, not due to formatting params)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
@@ -27,4 +27,4 @@ jobs:
             echo "FAIL: expected action to fail with invalid token, but got outcome=$OUTCOME"
             exit 1
           fi
-          echo "PASS: action correctly failed at API call (not at blocks/attachments param parsing)"
+          echo "PASS: action correctly failed at API call (not at formatting param parsing)"
