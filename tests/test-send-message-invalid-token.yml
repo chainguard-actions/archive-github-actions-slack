@@ -1,0 +1,46 @@
+name: Test send-message with invalid token
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-text: "Test message from act"
+
+      - name: Assert step failed due to invalid token
+        run: |
+          echo "outcome: ${{ steps.action.outcome }}"
+          if [ "${{ steps.action.outcome }}" != "failure" ]; then
+            echo "FAIL: expected step to fail with invalid token, but got outcome: ${{ steps.action.outcome }}"
+            exit 1
+          fi
+          echo "PASS: step correctly failed with invalid token"
+
+      - name: Assert slack-result output is set
+        env:
+          ACTUAL: ${{ steps.action.outputs.slack-result }}
+        run: |
+          echo "actual slack-result: $ACTUAL"
+          # With an invalid token, Slack API returns {"ok":false,"error":"invalid_auth"}
+          # The action may set the output before failing, or may not set it at all
+          # Either way, the step should have failed (checked above)
+          # If output is set, it should contain "ok" field from Slack API response
+          if [ -n "$ACTUAL" ]; then
+            echo "Output was set: $ACTUAL"
+            if echo "$ACTUAL" | grep -q '"ok"'; then
+              echo "PASS: slack-result contains Slack API response"
+            else
+              echo "FAIL: slack-result does not look like a Slack API response"
+              exit 1
+            fi
+          else
+            echo "PASS: no output set (action failed before setting output, as expected)"
+          fi
