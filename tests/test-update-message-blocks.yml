@@ -15,7 +15,7 @@ jobs:
           slack-channel: C0000000000
           slack-function: update-message
           slack-update-message-ts: "1234567890.123456"
-          slack-update-message-text: "Updated message text with blocks"
+          slack-update-message-text: "Updated message with blocks"
           slack-update-message-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Updated *block* content\"}}]"
 
       - name: Assert action ran and failed with invalid token

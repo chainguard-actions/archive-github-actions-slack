@@ -1,0 +1,42 @@
+name: test-10-fake-build-updates
+
+on: [push]
+
+permissions: {}
+
+jobs:
+  slack-action:
+    #if: ${{ false }}
+    runs-on: ubuntu-latest
+    name: Test 10 [ubuntu-latest]
+
+    steps:
+      - name: Send build started to slack
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        id: slack-build-started
+
+        with:
+          slack-function: send-message
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: C036UR31LTD
+          slack-text: |
+            Test 10 -
+            hourglass: Build status: Building...
+
+            Please wait 😁
+
+      - name: Fake build process
+        id: fake-build-process
+        run: |
+          echo 'BUILD_RESULT<<EOF' >> $GITHUB_OUTPUT
+          curl https://httpbin.org/json -s >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
+
+      - name: Update slack with build result
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        with:
+          slack-function: update-message
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: C036UR31LTD
+          slack-update-message-ts: ${{ fromJson(steps.slack-build-started.outputs.slack-result).response.message.ts }}
+          slack-update-message-text: "${{ format('{0}\n\n```{1}```', 'Test 10 - :no_entry_sign: Build status: Failed!', steps.fake-build-process.outputs.BUILD_RESULT) }}"

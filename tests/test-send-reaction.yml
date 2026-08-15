@@ -14,7 +14,7 @@ jobs:
           slack-bot-user-oauth-access-token: xoxb-fake-token-for-testing
           slack-channel: C0000000000
           slack-function: send-reaction
-          slack-emoji-name: thumbsup
+          slack-emoji-name: "thumbsup"
           slack-message-timestamp: "1234567890.123456"
 
       - name: Assert action ran and failed with invalid token

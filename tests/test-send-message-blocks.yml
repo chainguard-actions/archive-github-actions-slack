@@ -1,4 +1,4 @@
-name: Test send-message with blocks and advanced options
+name: Test send-message with blocks and extended optional parameters
 on:
   workflow_dispatch:
 jobs:
