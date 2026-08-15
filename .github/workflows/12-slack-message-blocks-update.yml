@@ -1,0 +1,55 @@
+name: test-12-slack-message-blocks-update
+
+on: [push, issues]
+
+permissions: {}
+
+jobs:
+  slack-action:
+    #if: ${{ false }}
+    runs-on: ubuntu-24.04
+    name: Test 12 [ubuntu-24.04]
+
+    steps:
+      - name: Send Slack Message (Blocks)
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        id: send-message
+        with:
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: C046FKM3TNF
+          slack-optional-blocks: >-
+            [
+              {
+                "block_id": "text1",
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Building... *please wait*"
+                }
+              }
+            ]
+
+      - name: Result from "Send Slack Message"
+        env:
+          SLACK_RESULT: ${{ steps.send-message.outputs.slack-result }}
+        run: echo "$SLACK_RESULT"
+
+      - name: Send Slack Message (Blocks) - Update
+        uses: archive/github-actions-slack@433fef9978d3adae73168bfc9c5a7ce722780231 # master
+        id: send-message-update
+        with:
+          slack-function: update-message
+          slack-bot-user-oauth-access-token: ${{ secrets.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN }}
+          slack-channel: C046FKM3TNF
+          slack-update-message-ts: ${{ fromJson(steps.send-message.outputs.slack-result).response.message.ts }}
+          slack-update-message-blocks: >-
+            [
+              {
+                "block_id": "text1",
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Building... *done!*"
+                }
+              }
+            ]

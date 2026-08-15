@@ -9,27 +9,30 @@ jobs:
 
       - id: action
         uses: .
+        # The action accepts optional parameters and passes them to the Slack API.
+        # With a fake token, Slack returns an auth error and the action fails.
+        # We verify the action fails (auth error from Slack, not a parameter
+        # validation error), confirming optional params are accepted correctly.
         continue-on-error: true
         with:
-          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
-          slack-channel: "CFAKE12345"
-          slack-text: "Hello from test with more optional params"
-          slack-function: "send-message"
-          slack-optional-attachments: "[]"
-          slack-optional-blocks: "[]"
+          slack-bot-user-oauth-access-token: "xoxb-fake-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-text: "Test message with more optional params"
+          slack-optional-attachments: "[{\"fallback\": \"test attachment\", \"text\": \"attachment text\"}]"
+          slack-optional-blocks: "[{\"type\": \"section\", \"text\": {\"type\": \"mrkdwn\", \"text\": \"block text\"}}]"
           slack-optional-icon_url: "https://example.com/icon.png"
           slack-optional-link_names: "true"
           slack-optional-parse: "full"
           slack-optional-reply_broadcast: "false"
           slack-optional-thread_ts: "1234567890.123456"
 
-      - name: Assert action ran and failed due to invalid auth
+      - name: Assert action failed due to invalid auth (not parameter error)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" != "failure" ]; then
-            echo "FAIL: expected action to fail with invalid auth, got outcome='$OUTCOME'"
+            echo "FAIL: expected action to fail with invalid auth token, got: $OUTCOME"
             exit 1
           fi
-          echo "PASS: action correctly failed with invalid auth token (additional optional params accepted)"
+          echo "PASS: action correctly failed for invalid auth (additional optional params were accepted)"

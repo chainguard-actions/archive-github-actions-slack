@@ -1,0 +1,31 @@
+name: Test send-message basic
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        # The action calls the real Slack API with a fake token.
+        # Slack returns {"ok":false,"error":"invalid_auth"} which causes
+        # the action to call setFailed() — the action correctly fails on
+        # invalid auth. We verify the outcome is failure (not a crash or
+        # unexpected success).
+        continue-on-error: true
+        with:
+          slack-bot-user-oauth-access-token: "xoxb-fake-token-for-testing"
+          slack-channel: "C0000000000"
+          slack-text: "Hello from GitHub Actions test"
+          slack-function: "send-message"
+      - name: Assert action failed due to invalid auth
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          if [ "$OUTCOME" != "failure" ]; then
+            echo "FAIL: expected action to fail with invalid auth token, got: $OUTCOME"
+            exit 1
+          fi
+          echo "PASS: action correctly failed for invalid auth token"

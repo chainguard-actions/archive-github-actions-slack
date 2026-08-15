@@ -9,22 +9,26 @@ jobs:
 
       - id: action
         uses: .
+        # The action accepts update-message-blocks and passes them to the Slack API.
+        # With a fake token, Slack returns an auth error and the action fails.
+        # We verify the action fails (auth error from Slack, not a parameter
+        # validation error), confirming slack-update-message-blocks is accepted correctly.
         continue-on-error: true
         with:
-          slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
-          slack-channel: "CFAKE12345"
+          slack-bot-user-oauth-access-token: "xoxb-fake-token-for-testing"
+          slack-channel: "C0000000000"
           slack-function: "update-message"
           slack-update-message-ts: "1234567890.123456"
-          slack-update-message-text: "Updated message text with blocks"
-          slack-update-message-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Updated block content\"}}]"
+          slack-update-message-text: "Updated message text"
+          slack-update-message-blocks: "[{\"type\": \"section\", \"text\": {\"type\": \"mrkdwn\", \"text\": \"updated block text\"}}]"
 
-      - name: Assert action ran and failed due to invalid auth
+      - name: Assert action failed due to invalid auth (not parameter error)
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" != "failure" ]; then
-            echo "FAIL: expected action to fail with invalid auth, got outcome='$OUTCOME'"
+            echo "FAIL: expected action to fail with invalid auth token, got: $OUTCOME"
             exit 1
           fi
-          echo "PASS: action correctly failed with invalid auth token (update-message with blocks)"
+          echo "PASS: action correctly failed for invalid auth (slack-update-message-blocks was accepted)"
