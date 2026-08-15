@@ -1,4 +1,4 @@
-name: Test update-message with blocks
+name: Test update-message with invalid token
 on:
   workflow_dispatch:
 jobs:
@@ -16,15 +16,14 @@ jobs:
           slack-function: "update-message"
           slack-update-message-ts: "1234567890.123456"
           slack-update-message-text: "Updated message text"
-          slack-update-message-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Updated block content\"}}]"
 
-      - name: Assert step failed due to invalid token on update-message with blocks
+      - name: Assert step failed due to invalid token on update-message
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
           echo "outcome: $OUTCOME"
           if [ "$OUTCOME" != "failure" ]; then
-            echo "FAIL: expected step to fail with invalid token on update-message with blocks, got outcome=$OUTCOME"
+            echo "FAIL: expected step to fail with invalid token on update-message, got outcome=$OUTCOME"
             exit 1
           fi
-          echo "PASS: step correctly failed with invalid token when using update-message-blocks"
+          echo "PASS: step correctly failed with invalid token on update-message"

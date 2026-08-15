@@ -1,4 +1,4 @@
-name: Test send-message with attachments and icon_url options
+name: Test send-message with slack-blocks input
 on:
   workflow_dispatch:
 jobs:
@@ -13,10 +13,8 @@ jobs:
         with:
           slack-bot-user-oauth-access-token: "xoxb-invalid-token-for-testing"
           slack-channel: "C0000000000"
-          slack-text: "Test message with attachments"
           slack-function: "send-message"
-          slack-optional-attachments: "[{\"text\":\"Attachment text\",\"color\":\"#36a64f\"}]"
-          slack-optional-icon_url: "https://example.com/icon.png"
+          slack-blocks: "[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"Hello from blocks\"}}]"
 
       - name: Assert step failed due to invalid token
         env:
@@ -27,4 +25,4 @@ jobs:
             echo "FAIL: expected step to fail with invalid token, got outcome=$OUTCOME"
             exit 1
           fi
-          echo "PASS: step correctly failed with invalid token when using attachments and icon_url"
+          echo "PASS: step correctly failed with invalid token when using slack-blocks"
